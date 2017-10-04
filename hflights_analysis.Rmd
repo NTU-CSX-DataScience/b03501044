@@ -1,0 +1,88 @@
+---
+title: "飛機延誤抵達之要素分析"
+author: "B03501044-Jeffery_Sheih"
+date: "2017/9/28"
+output: html_document
+---
+
+通常飛機延誤的原油包括下列幾點因素：
+
+* 天氣原因：雷、雲、霧等不良天氣因素
+* 航空管制：國防機密
+* 飛機故障
+* 旅客原因
+* 航空公司原因
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r message = FALSE}
+library(nycflights13)
+library(knitr)
+library(lubridate)
+library(dplyr)
+library(hflights)
+library(ggplot2)
+```
+
+
+使用之資料如下：
+
+飛機航班資訊
+```{r}
+kable(head(hflights))
+```
+
+
+機場位置資訊
+```{r}
+kable(head(airports))
+```
+
+飛機製造資訊
+```{r}
+kable(head(planes))
+```
+
+##飛機延誤抵達機場與飛機使用時數關聯分析
+```{r warning=FALSE,echo = TRUE}
+planes_info = hflights %>%
+  inner_join(planes,by = c("TailNum" = "tailnum")) %>%
+  select(TailNum,ArrDelay,Year,manufacturer,produce_year = year) %>%
+  mutate(age = Year - produce_year) %>%
+  group_by(TailNum,manufacturer,age) %>%
+  summarise(avg_delay = mean(ArrDelay,na.rm = TRUE))
+
+planes_info %>%
+  filter(avg_delay > 0) %>%
+  ggplot(aes(x = age,y = avg_delay)) + geom_point(alpha = 0.5)
+  
+```
+
+
+##飛機延誤抵達機場與機場所在地關聯分析
+```{r echo = TRUE}
+avg_dest_delay_top10 = hflights %>%
+  group_by(Dest) %>%
+  summarise(delay = mean(ArrDelay,na.rm = TRUE)) %>%
+  arrange(desc(delay)) %>%
+  head(10) %>%  
+  inner_join(airports,by = c("Dest" = "faa"))
+
+avg_dest_delay_top10 %>%
+  ggplot(aes(lon, lat)) +
+  borders("state") +
+  geom_point(aes(colour = delay)) +
+  coord_quickmap()
+```
+
+
+##Q&A
+```{r}
+wind_speed_dist = weather %>% 
+  count(wind_speed)
+kable(head(wind_speed_dist))
+```
+
+
