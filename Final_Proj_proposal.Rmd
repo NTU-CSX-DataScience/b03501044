@@ -1,6 +1,6 @@
 ---
 title: "Final_Proj"
-author: "B03501044-Jeffery_Sheih"
+author: "土木三-B03501044-謝伯徽"
 date: "2017/10/18"
 output: html_document
 ---
