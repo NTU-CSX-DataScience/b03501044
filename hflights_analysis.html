@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="B03501044-Jeffery_Sheih" />
+<meta name="author" content="土木三-B03501044-謝伯徽" />
 
 
 <title>飛機延誤抵達之要素分析</title>
@@ -117,7 +117,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">飛機延誤抵達之要素分析</h1>
-<h4 class="author"><em>B03501044-Jeffery_Sheih</em></h4>
+<h4 class="author"><em>土木三-B03501044-謝伯徽</em></h4>
 <h4 class="date"><em>2017/9/28</em></h4>
 
 </div>
@@ -131,8 +131,15 @@ $(document).ready(function () {
 <li>旅客原因</li>
 <li>航空公司原因</li>
 </ul>
+<pre class="r"><code>library(nycflights13)
+library(knitr)
+library(lubridate)
+library(dplyr)
+library(hflights)
+library(ggplot2)</code></pre>
 <p>使用之資料如下：</p>
 <p>飛機航班資訊</p>
+<pre class="r"><code>kable(head(hflights))</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -308,6 +315,7 @@ $(document).ready(function () {
 </tbody>
 </table>
 <p>機場位置資訊</p>
+<pre class="r"><code>kable(head(airports))</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -385,6 +393,7 @@ $(document).ready(function () {
 </tbody>
 </table>
 <p>飛機製造資訊</p>
+<pre class="r"><code>kable(head(planes))</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -500,6 +509,9 @@ avg_dest_delay_top10 %&gt;%
 </div>
 <div id="qa" class="section level2">
 <h2>Q&amp;A</h2>
+<pre class="r"><code>wind_speed_dist = weather %&gt;% 
+  count(wind_speed)
+kable(head(wind_speed_dist))</code></pre>
 <table>
 <thead>
 <tr class="header">

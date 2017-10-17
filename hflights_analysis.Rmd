@@ -1,6 +1,6 @@
 ---
 title: "飛機延誤抵達之要素分析"
-author: "B03501044-Jeffery_Sheih"
+author: "土木三-B03501044-謝伯徽"
 date: "2017/9/28"
 output: html_document
 ---
@@ -14,7 +14,7 @@ output: html_document
 * 航空公司原因
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r message = FALSE}
@@ -46,7 +46,7 @@ kable(head(planes))
 ```
 
 ##飛機延誤抵達機場與飛機使用時數關聯分析
-```{r warning=FALSE,echo = TRUE}
+```{r warning=FALSE}
 planes_info = hflights %>%
   inner_join(planes,by = c("TailNum" = "tailnum")) %>%
   select(TailNum,ArrDelay,Year,manufacturer,produce_year = year) %>%
@@ -62,7 +62,7 @@ planes_info %>%
 
 
 ##飛機延誤抵達機場與機場所在地關聯分析
-```{r echo = TRUE}
+```{r}
 avg_dest_delay_top10 = hflights %>%
   group_by(Dest) %>%
   summarise(delay = mean(ArrDelay,na.rm = TRUE)) %>%
