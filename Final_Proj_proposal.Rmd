@@ -1,0 +1,26 @@
+---
+title: "Final_Proj"
+author: "B03501044-Jeffery_Sheih"
+date: "2017/10/18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 期末分析報告提案
+
+關於期末報告的初步想法會是閱讀股票相關書籍，找出可能主要影響股票走勢的因子，加以分析後建立模型，輸入提供的參數，驗證模型準確度。
+
+
+
+## 預期經濟知識範疇
+
+...to be continued
+
+
+
+## 預期R知識範疇
+packages:dplyr,ggplot2,jasonlite,readr,lubridate...</br>
+machine learning:PCA,KMeans...
