@@ -1,0 +1,73 @@
+---
+title: "Facebbok Crawler and visualization in wordcloud"
+author: "B03501044-Jeffery_Sheih"
+date: "11/2/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message = FALSE}
+library(httr)
+library(jiebaRD)
+library(jiebaR)
+library(tm)
+library(dplyr)
+library(wordcloud)
+```
+
+
+#文本清理
+將欲分析之本機txt檔讀入，使用 **tm** package進行資料的清理，去除無效的用詞如：特殊符號、停留詞、英文字、數字等，使用 **jiebaR** package進行斷詞
+```{r results='hide',warning=FALSE}
+#load files
+filenames = list.files(getwd(),pattern = "*.txt")
+files = lapply(filenames,readLines)
+docs = Corpus(VectorSource(files))
+
+#remove meaningless character
+toSpace = content_transformer(function(x,pattern) {
+  return (gsub(pattern," ",x))
+})
+
+docs = tm_map(docs,toSpace,"【")
+docs = tm_map(docs,toSpace,"】")
+docs = tm_map(docs,toSpace,"\\[")
+docs = tm_map(docs,toSpace,"\\]")
+docs = tm_map(docs,toSpace,"的")
+docs = tm_map(docs,toSpace,"了")
+docs = tm_map(docs,toSpace,"有")
+docs = tm_map(docs,toSpace,"可")
+docs = tm_map(docs,toSpace,"或")
+docs = tm_map(docs,toSpace,"月")
+docs = tm_map(docs, removePunctuation)
+docs = tm_map(docs,removeNumbers)
+
+#words cut
+cutter = worker()
+new_user_word(cutter,"捷運站")
+
+tokenizer = function(x) {
+  segment(x,cutter)
+}
+
+freqFrame = as.data.frame(table(unlist(lapply(docs,tokenizer)))) %>%
+  arrange(desc(Freq))
+
+```
+
+將文本處理結果以文字雲的方式視覺化
+```{r warning=FALSE}
+#build a wordcloud
+par(family=("Heiti TC Light"))
+wordcloud(freqFrame$Var1,freqFrame$Freq,
+          scale=c(5,0.1),min.freq=50,max.words=150,
+          random.order=TRUE, random.color=FALSE,
+          rot.per=.1, colors=brewer.pal(8, "Dark2"),
+          ordered.colors=FALSE,use.r.layout=FALSE,
+          fixed.asp=TRUE)
+
+```
+
