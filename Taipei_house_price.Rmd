@@ -1,0 +1,69 @@
+---
+title: "Taipei_land_price_analysis"
+author: "B03501044-Jeffery_Sheih"
+date: "12/22/2017"
+output: html_document
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("SVM.R")
+```
+
+###動機
+起因於最近正在找台北的房子，希望短期內能找到一個離學校不遠但價錢尚能接受的住處，而長期而言，也希望畢業後能在台北找到不錯的房子，對於可能影響台北房價的因素必須有一定的了解，如地區性、交通便利性、屋齡、主要建材等等，而在此次的作業中希望能透過單位面積的價位區分出房價會如何座落在台北各區。
+
+
+###資料概況
+本資料提供建物交易、用途、車位、建物情況等，此次分析主要觀察單價每平方公尺的價格在不同地區的高低，但由於租金總額元大多數資料不全，而由內政部不動產交易查詢服務網推得`租賃總額(元/月)/總坪數(坪) = 單價每平方公尺`
+```{r}
+head(taipei_rent)
+```
+
+###資料篩選
+因分析對象為出租型態為住家使用，因此篩選出以下三種類別：住宅大樓(11層含以上有電梯),公寓(5樓含以下無電梯),套房(1房1廳1衛)
+```{r}
+head(taipei_target_rent)
+```
+
+###房屋位址
+個人認為因房地產與土地位址息息相關，適合將結果與地圖結合，因此根據`土地區段位置或建物區門牌`利用google map api得到各地址的經緯度
+
+```{r}
+head(location_from_api)
+```
+
+###房屋價格高低定義
+將單價每平方公尺價格以每100元為區間，分割結果如下，定義600元以上為較高的房屋價格，600元以下則反之
+```{r}
+table(cut(taipei_target_rent$單價每平方公尺,breaks = 100*(1:10)))
+```
+
+###SVM
+利用package提供之tune方法找出最佳model parameters，建立模型並畫出結果
+```{r warning=FALSE}
+svm_tune = tune(svm, train.x=dat[,c(1,2)], train.y=label, 
+     kernel="radial", ranges=list(cost=10^(-1:2), gamma=c(.5,1,2)))
+print(svm_tune)
+
+svm_model = svm(label ~ .,data = dat,kernel = "radial",cost = 1,gamma = 1)
+plot(svm_model,dat)
+```
+
+###利用地圖顯示房屋價格較高分佈情況
+```{r warning=FALSE}
+#plot the house location on the map
+map <- get_map(location = c(lon = 121.564433,lat = 25.037785), zoom = 12,
+               language = "zh-TW",maptype = "roadmap")
+
+ggmap(map,darken = c(0.2,"white")) + geom_point(aes(x = lng,y = lat,colour = label),data = dat) + 
+  labs(x = "Latitude",y = "Longtitude") +
+  scale_colour_discrete(name = "House Price",labels = c("Cheap","Expensive")) 
+```
+
+###結論
+由performance與圖中其實可觀察到svm的表現不佳，推測可能因為影響房地產價格的原因十分眾多，只根據房屋地址推估房地產價格過於粗略，改善方向為考慮其他可能重大影響因素。
+
+
