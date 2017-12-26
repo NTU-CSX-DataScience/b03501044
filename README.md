@@ -4,3 +4,4 @@
 * 作業二 ggplot2繪圖呈現：https://ntu-csx-datascience.github.io/b03501044/hflights_analysis.html  
 * 作業三 文字雲：https://ntu-csx-datascience.github.io/b03501044/FacebookCrawler.html  
 * 作業四 TF-IDF & KMeans：
+* 作業五 SVM：https://ntu-csx-datascience.github.io/b03501044/Taipei_house_price.html  
