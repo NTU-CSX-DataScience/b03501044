@@ -1,0 +1,86 @@
+---
+title: "Policy_analysis"
+author: "B03501044-Jeffery_Sheih"
+date: "12/23/2017"
+output: html_document
+---
+
+##動機
+由於現代獲取資訊的管道眾多，各式各樣新興的網路媒體逐漸受到民眾的重視，不再受限於部分主流媒體的報導，有更多的選擇可以互相比較，而較不容易因部分觀點導致以偏概全。另外談到最近十分熱門的議題：一例一休，對於台灣的工作環境有重大的影響，而大部分的資訊提供者皆為勞工團體之聲明與批評，因此嘗試透過對數個新聞來源進行分析，觀察各新聞之間對於一例一修是否存在相似的觀點，或是相反的想法。
+
+##一例一休政策簡介
+雇主可以在徵詢勞工同意後，讓勞工在法定的休息日加班。至於例假日只有在必要（天災、事變或是突發事件）時，雇主才能要求勞工加班，其中勞工在“一例”的例假日加班後，雇主依規定應予勞工擇日補假，《勞動基準法》的相關修正案已於2016年12月6日在立法院三讀通過。然而不管是例假日，還是休息日，只要勞工有加班，雇主都需要付加班費給勞工
+
+[from wiki](https://zh.wikipedia.org/wiki/一例一休)
+
+##文本的來源
+自由時報(p1)、東森新聞雲(p2)、聯合新聞網(p3)，因此議題最受重視的時間約為10、11兩月，所以主要抓取的新聞時間範圍同上
+
+```{r message=FALSE}
+library(tm)
+library(jiebaR)
+library(stats)
+library(Matrix)
+library(dplyr)
+
+source("clean_docs.R")
+
+```
+
+##將資料讀入
+```{r warning=FALSE}
+#read the data
+news_dir = paste0(getwd(),"/news/",c("p1","p2","p3"))
+news = lapply(news_dir,list.files,pattern = "*.txt",full.names = TRUE)
+content = lapply(news,function(x) unlist(lapply(x,readLines)))
+
+docs = Corpus(VectorSource(content))
+```
+
+##將文件內容清理、分割
+```{r}
+#dat preprocess
+docs = clean_useless_words(docs)
+
+cutter = worker()
+new_user_word(cutter,"一例一休","n")
+tokenizer = function(x) {
+  segment(x,cutter)
+}
+
+docs = Corpus(VectorSource(lapply(docs,tokenizer)))
+```
+
+##將資料彙整成詞頻矩陣，再經由tf-idf轉換
+```{r}
+#build TermDocumentMatrix
+tdm = TermDocumentMatrix(docs,control = list(wordLengths = c(2,Inf)))
+
+#analyze data with TF-IDF
+N = tdm[["ncol"]]
+tf = apply(tdm,2,sum)
+
+idfcal = function(wordfreq) {
+  log2(N/nnzero(wordfreq))
+}
+
+idf = apply(tdm,1,idfcal)
+
+tdm_tfidf = as.matrix(tdm)
+for (i in nrow(tdm)) {
+  for (j in ncol(tdm)) {
+    tdm_tfidf[i,j] = tdm_tfidf[i,j] / tf[j] * idf[i]
+  }
+}
+```
+
+##kmeans cluster
+利用kmeans分出較相近觀點的新聞來源
+```{r}
+tdm_tfidf = t(tdm_tfidf)
+cluster = kmeans(tdm_tfidf, 2,nstart = 20)
+
+plot(tdm_tfidf,col = (cluster$cluster+1),pch = 20,cex = 2)
+```
+
+
