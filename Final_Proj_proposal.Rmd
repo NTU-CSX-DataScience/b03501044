@@ -13,14 +13,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 關於期末報告的初步想法會是閱讀股票相關書籍，找出可能主要影響股票走勢的因子，加以分析後建立模型，輸入提供的參數，驗證模型準確度。
 
+![股價](/Users/jeffery/Desktop/Artboard.png)
 
-
-## 預期經濟知識範疇
-
-...to be continued
-
-
+## 預計參數
+* 每月營收
+* 總資產
+* 股東權益報酬率(ROE)：企業為整體股東資金獲利的效率
+* 流動資產：可變現和運用的資產
+* 固定資產：使用年限超過一年的實體資產
+* 長期負債：企業長期還債能力
+* 現金股利：公司將部分盈餘以現金方式發放給股東的收益
+* 股票股利：公司將盈餘轉成增資，以股票形式分配給股東
 
 ## 預期R知識範疇
 packages:dplyr,ggplot2,jasonlite,readr,lubridate...</br>
-machine learning:PCA,KMeans...
+machine learning:KMeans...
